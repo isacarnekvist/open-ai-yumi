@@ -27,7 +27,8 @@ class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         utils.EzPickle.__init__(self)
 
         # Manually define this to let a be in [-1, 1]^d
-        self.action_space = spaces.Box(low=-np.ones(7), high=np.ones(7), dtype=np.float32)
+        self.action_space = spaces.Box(low=-np.ones(7) * 2, high=np.ones(7) * 2, dtype=np.float32)
+        self.set_task_params(0.9, 0.0, 0.0, 0.2)
 
     def set_task_params(self, wt, x, y, z):
         self.wt = wt
@@ -38,7 +39,7 @@ class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.set_state(qpos, qvel)
 
     def step(self, a):
-        a_real = a * self.high
+        a_real = a * self.high / 2
         self.do_simulation(a_real, self.frame_skip)
         reward = self._reward(a_real)
         done = False
@@ -49,10 +50,12 @@ class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         eef = self.get_body_com('gripper_r_base')
         goal = self.get_body_com('goal')
         goal_distance = np.linalg.norm(eef - goal)
+        q_norm = np.linalg.norm(self.sim.data.qpos.flat[:7]) / 7
         if goal_distance > 0.025:
             reward = -(
-                self.wt * np.linalg.norm(eef - goal) * 2.0 +
-                self.we * np.linalg.norm(a) / 40
+                0.3 * self.wt * np.linalg.norm(eef - goal) * 2.0 +
+                0.3 * self.we * np.linalg.norm(a) / 40 +
+                q_norm
             )
         else:
             reward = 0.0
@@ -60,14 +63,14 @@ class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         return np.concatenate([
-            self.sim.data.qpos.flat[1:],
-            np.clip(self.sim.data.qvel.flat, -10, 10)
+            self.sim.data.qpos.flat[:7],
+            np.clip(self.sim.data.qvel.flat[:7], -10, 10)
         ])
 
     def reset_model(self):
         low  = np.array([-1.0,-0.3,-0.4,-0.4])
         high = np.array([ 0.4, 0.6, 0.4, 0.4])
-        self.init_qpos[:4] = np.random.uniform(low, high)
+        #self.init_qpos[:4] = np.random.uniform(low, high)
         self.set_state(self.init_qpos, self.init_qvel)
         return self._get_obs()
 

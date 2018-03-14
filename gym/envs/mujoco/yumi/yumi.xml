@@ -3,7 +3,7 @@
     <visual>
         <quality shadowsize="10000"/>
     </visual>
-    <option timestep="0.01" gravity="0 0 -9.82" integrator="Euler" />
+    <option timestep="0.01" gravity="0 0 0" integrator="Euler" />
     <size njmax="500" nconmax="100" />
     <asset>
         <mesh name="coarse_body" file="coarse_body.stl" />
