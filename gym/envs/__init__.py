@@ -1,5 +1,12 @@
 from gym.envs.registration import registry, register, make, spec
 
+register(
+    id='YumiReacher-v0',
+    entry_point='gym.envs.mujoco:YumiReacherEnv',
+    max_episode_steps=200,
+    reward_threshold=25.0,
+)
+
 # Algorithmic
 # ----------------------------------------
 
