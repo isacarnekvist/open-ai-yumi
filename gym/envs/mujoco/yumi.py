@@ -50,11 +50,11 @@ class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         eef = self.get_body_com('gripper_r_base')
         goal = self.get_body_com('goal')
         goal_distance = np.linalg.norm(eef - goal)
-        q_vel_norm = np.linalg.norm(self.sim.data.qvel.flat[:7]) / 2.0
+        q_norm = np.linalg.norm(self.sim.data.qpos.flat[:7]) ** 4 / 100.0
         reward = -(
             self.wt * goal_distance * 2.0 +
             self.we * np.linalg.norm(a) / 40 +
-            q_vel_norm
+            q_norm
         )
         return reward
 
@@ -65,7 +65,7 @@ class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         ])
 
     def reset_model(self):
-        low  = np.array([-1.0,-0.3,-0.4,-0.4, 0.3, 0.3, 0.3])
+        low  = np.array([-1.0,-0.3,-0.4,-0.4,-0.3,-0.3,-0.3])
         high = np.array([ 0.4, 0.6, 0.4, 0.4, 0.3, 0.3, 0.3])
         self.init_qpos[:7] = np.random.uniform(low, high)
         self.set_state(self.init_qpos, self.init_qvel)
