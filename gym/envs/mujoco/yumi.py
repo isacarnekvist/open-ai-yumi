@@ -50,9 +50,11 @@ class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         eef = self.get_body_com('gripper_r_base')
         goal = self.get_body_com('goal')
         goal_distance = np.linalg.norm(eef - goal)
+        # This is the norm of the joint angles
+        # The ** 4 is to create a "flat" region around [0, 0, 0, ...]
         q_norm = np.linalg.norm(self.sim.data.qpos.flat[:7]) ** 4 / 100.0
         reward = -(
-            self.wt * goal_distance * 2.0 +
+            self.wt * goal_distance * 2.0 + # Scolars here is to make this part of the reward approx. [0, 1]
             self.we * np.linalg.norm(a) / 40 +
             q_norm
         )
