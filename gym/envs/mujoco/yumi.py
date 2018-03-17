@@ -28,9 +28,13 @@ class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         # Manually define this to let a be in [-1, 1]^d
         self.action_space = spaces.Box(low=-np.ones(7) * 2, high=np.ones(7) * 2, dtype=np.float32)
-        self.set_task_params(0.9, 0.0, 0.0, 0.2)
+        self.init_params()
 
-    def set_task_params(self, wt, x, y, z):
+    def init_params(self, wt=0.9, x=0.0, y=0.0, z=0.2):
+        """
+        :param wt: Float in range (0, 1), weight on euclidean loss
+        :param x, y, z: Position of goal
+        """
         self.wt = wt
         self.we = 1 - wt
         qpos = self.init_qpos
