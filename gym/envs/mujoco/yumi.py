@@ -1,5 +1,4 @@
 import os
-import datetime
 
 import numpy as np
 from gym import utils, spaces
@@ -13,6 +12,28 @@ def body_index(model, body_name):
 def body_pos(model, body_name):
     ind = body_index(model, body_name)
     return model.body_pos[ind]
+
+
+def body_quat(model, body_name):
+    ind = body_index(model, body_name)
+    return model.body_quat[ind]
+
+
+def body_frame(env, body_name):
+    """
+    Returns the rotation matrix to convert to the frame of the named body
+    """
+    ind = body_index(env.model, body_name)
+    b = env.data.body_xpos[ind]
+    q = env.data.body_xquat[ind]
+    qr, qi, qj, qk = q
+    s = np.square(q).sum()
+    R = np.array([
+        [1 - 2 * s * (qj ** 2 + qk ** 2), 2 * s * (qi * qj - qk * qr), 2 * s * (qi * qk + qj * qr)],
+        [2 * s * (qi * qj + qk * qr), 1 - 2 * s * (qi ** 2 + qk ** 2), 2 * s * (qj * qk - qi * qr)],
+        [2 * s * (qi * qk - qj * qr), 2 * s * (qj * qk + qi * qr), 1 - 2 * s * (qi ** 2 + qj ** 2)]
+    ])
+    return R
 
 
 class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
@@ -57,8 +78,11 @@ class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # This is the norm of the joint angles
         # The ** 4 is to create a "flat" region around [0, 0, 0, ...]
         q_norm = np.linalg.norm(self.sim.data.qpos.flat[:7]) ** 4 / 100.0
+        f_desired = np.eye(3)
+        f_desired[0, 0] = -1
+        f_current = body_frame(self, 'gripper_r_base')
         reward = -(
-            self.wt * goal_distance * 2.0 + # Scolars here is to make this part of the reward approx. [0, 1]
+            self.wt * goal_distance * 2.0 + # Scalars here is to make this part of the reward approx. [0, 1]
             self.we * np.linalg.norm(a) / 40 +
             q_norm
         )
