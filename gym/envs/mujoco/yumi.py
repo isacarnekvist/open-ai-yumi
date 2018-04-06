@@ -97,9 +97,12 @@ class YumiReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         ])
 
     def reset_model(self):
-        low  = np.array([-1.0,-0.3,-0.4,-0.4,-0.3,-0.3,-0.3])
-        high = np.array([ 0.4, 0.6, 0.4, 0.4, 0.3, 0.3, 0.3])
-        self.init_qpos[:7] = np.random.uniform(low, high)
+        pos_low  = np.array([-1.0,-0.3,-0.4,-0.4,-0.3,-0.3,-0.3])
+        pos_high = np.array([ 0.4, 0.6, 0.4, 0.4, 0.3, 0.3, 0.3])
+        self.init_qpos[:7] = np.random.uniform(pos_low, pos_high)
+        vel_high = np.ones(7) * 0.5
+        vel_low = -vel_high
+        self.init_qvel[:7] = np.random.uniform(vel_low, vel_high)
         self.set_state(self.init_qpos, self.init_qvel)
         return self._get_obs()
 
