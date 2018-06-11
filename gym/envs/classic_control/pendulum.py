@@ -15,35 +15,53 @@ class PendulumEnv(gym.Env):
         self.max_torque=2.
         self.dt=.05
         self.viewer = None
+        self.g = 10.0
+        self.l = 1.0
+        self.m = 1.0
+        self.action_cost = 0.001
 
-        high = np.array([1., 1., self.max_speed])
+        high = np.array([np.pi, self.max_speed])
         self.action_space = spaces.Box(low=-self.max_torque, high=self.max_torque, shape=(1,))
         self.observation_space = spaces.Box(low=-high, high=high)
-
         self.seed()
+
+    def init_params(self, mass_coeff, action_coeff):
+        self.m = 0.4 + mass_coeff * 0.4                  # [0.400, 0.800], original = 1.00
+        self.action_cost = 0.0005 + action_coeff * 0.0005    # [0.0005, 0.001], original = 0.001
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
     def step(self,u):
-        th, thdot = self.state # th := theta
+        u = np.clip(u, -self.max_torque, self.max_torque)
+        self.last_u = u # for rendering
 
-        g = 10.
-        m = 1.
-        l = 1.
+        newth, newthdot = self.forward(self.state, u)
+        self.state = np.array([newth, newthdot])
+
+        return self._get_obs(), self.reward(self.state, u), False, {}
+
+    def reward(self, state, u):
+        th, thdot = state
+        u = np.clip(u, -self.max_torque, self.max_torque)
+        costs = angle_normalize(th)**2 + .1*thdot**2 + self.action_cost * (u**2)
+        return -costs[0]
+
+    def forward(self, state, u):
+        g = self.g
+        m = self.m
+        l = self.l
         dt = self.dt
 
-        u = np.clip(u, -self.max_torque, self.max_torque)[0]
-        self.last_u = u # for rendering
-        costs = angle_normalize(th)**2 + .1*thdot**2 + .001*(u**2)
+        th, thdot = state
+        u = np.clip(u, -self.max_torque, self.max_torque)
 
         newthdot = thdot + (-3*g/(2*l) * np.sin(th + np.pi) + 3./(m*l**2)*u) * dt
         newth = th + newthdot*dt
-        newthdot = np.clip(newthdot, -self.max_speed, self.max_speed) #pylint: disable=E1111
+        newthdot = np.clip(newthdot, -self.max_speed, self.max_speed)
 
-        self.state = np.array([newth, newthdot])
-        return self._get_obs(), -costs, False, {}
+        return np.concatenate([newth, newthdot])
 
     def reset(self):
         high = np.array([np.pi, 1])
@@ -53,7 +71,7 @@ class PendulumEnv(gym.Env):
 
     def _get_obs(self):
         theta, thetadot = self.state
-        return np.array([np.cos(theta), np.sin(theta), thetadot])
+        return np.array([angle_normalize(theta), thetadot])
 
     def render(self, mode='human'):
 

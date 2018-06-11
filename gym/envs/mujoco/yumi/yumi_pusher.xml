@@ -1,5 +1,5 @@
 <mujoco model="yumi">
-    <compiler angle="radian" />
+    <compiler angle="radian"/>
     <visual>
         <quality shadowsize="10000"/>
     </visual>
@@ -22,7 +22,7 @@
         <camera name="extra_2" mode="fixed" pos="0.7 0.7 0.2" euler="1.57 2.3 0"/>
         <light diffuse=".5 .5 .5" pos="2 -2 2" dir="-1  1 -1"/>
         <light diffuse=".5 .5 .5" pos="2  2 2" dir="-1 -1 -1"/>
-        <geom rgba="1 1 1 1" name="table" type="box" pos="0 0 -0.01" size="0.4 0.5 0.01"/>
+        <geom rgba="1 1 1 1" name="table" type="box" pos="0 0 -0.01" size="0.4 0.5 0.01" contype="2" conaffinity="2"/>
         <body name="yumi_base_link" pos="-0.4 0 0">
             <inertial pos="0 0 0" mass="0" diaginertia="0 0 0" />
             <body name="yumi_body" pos="0 0 0">
@@ -59,16 +59,19 @@
                                             <body name="gripper_r_base" pos="0 0 0.007" quat="0 0 0 1">
                                                 <inertial pos="0 0 0" mass="0.2" diaginertia="0.0001 0.0001 0.0001" />
                                                 <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="base" />
-                                                <body name="gripper_r_finger_r" pos="0 -0.0065 0.0837">
+                                                <body pos="0 0 0.11">
+                                                    <geom type="cylinder" rgba="0.8 0.8 0.8 1" size="0.01 0.024" contype="1"/>
+                                                </body>
+                                                <!--body name="gripper_r_finger_r" pos="0.0 -0.0065 0.0837">
                                                     <inertial pos="0 0 0" mass="0.01" diaginertia="1e-06 1e-06 1e-06" />
                                                     <joint name="gripper_r_joint" pos="0 0 0" axis="-1 0 0" type="slide" limited="true" range="0 0.025" />
-                                                    <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="finger" />
+                                                    <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="finger" contype="1"/>
                                                 </body>
-                                                <body name="gripper_r_finger_l" pos="0 0.0065 0.0837" quat="0 0 0 1">
+                                                <body name="gripper_r_finger_l" pos="0.0 0.0065 0.0837" quat="0 0 0 1">
                                                     <inertial pos="0 0 0" mass="0.01" diaginertia="1e-06 1e-06 1e-06" />
                                                     <joint name="gripper_r_joint_m" pos="0 0 0" axis="-1 0 0" type="slide" limited="true" range="0 0.025"/>
-                                                    <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="finger"/>
-                                                </body>
+                                                    <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="finger" contype="1"/>
+                                                </body-->
                                             </body>
                                         </body>
                                     </body>
@@ -130,23 +133,28 @@
             </body>
         </body>
 
-        <body name="goal" pos="0.0 0.0 0.0">
-            <geom rgba="0 0 1 0.5" type="sphere" size="0.05 0.001 0.1" density='0.00001'/>
-            <joint name="goal_slidex" type="slide" pos="0 0 0" axis="1 0 0" range="-10.3213 10.3" damping="1.0"/>
-            <joint name="goal_slidey" type="slide" pos="0 0 0" axis="0 1 0" range="-10.3213 10.3" damping="1.0"/>
-            <joint name="goal_slidez" type="slide" pos="0 0 0" axis="0 0 1" range="-10.3213 10.3" damping="1.0"/>
+        <body name="object" pos="0.04 -0.1 0.02">
+            <geom rgba="1 0 0 1" type="box" size="0.02 0.02 0.02" contype="1" density="10"/>
+            <joint name="goal_slidex" type="slide" pos="0 0 0" axis="1 0 0" damping="0.005"/>
+            <joint name="goal_slidey" type="slide" pos="0 0 0" axis="0 1 0" damping="0.005"/>
+            <joint name="goal_rotate" type="hinge" pos="0 0 0" axis="0 0 1" damping="0.00001"/>
+            <!--joint name="goal_slidez" type="slide" pos="0 0 0" axis="0 0 1" range="-10.3213 10.3" damping="1.0"/-->
+        </body>
+
+        <body name="goal" pos="0.04 -0.1 0.021">
+            <geom rgba="1 0 0 0.2" type="box" size="0.02 0.02 0.019" contype="2" conaffinity="2"/>
         </body>
     </worldbody>
 
     <actuator>
         <!-- Don't change ranges here, change them in __init__ of YumiReacher -->
-        <motor joint="yumi_joint_1_r" ctrlrange="-100.0 100.0" ctrllimited="true"/>
-        <motor joint="yumi_joint_2_r" ctrlrange="-100.0 100.0" ctrllimited="true"/>
-        <motor joint="yumi_joint_7_r" ctrlrange="-100.0 100.0" ctrllimited="true"/>
-        <motor joint="yumi_joint_3_r" ctrlrange="-100.0 100.0" ctrllimited="true"/>
-        <motor joint="yumi_joint_4_r" ctrlrange="-100.0 100.0" ctrllimited="true"/>
-        <motor joint="yumi_joint_5_r" ctrlrange="-100.0 100.0" ctrllimited="true"/>
-        <motor joint="yumi_joint_6_r" ctrlrange="-100.0 100.0" ctrllimited="true"/>
+        <velocity joint="yumi_joint_1_r" ctrlrange="-100.0 100.0" ctrllimited="true" kv="1"/>
+        <velocity joint="yumi_joint_2_r" ctrlrange="-100.0 100.0" ctrllimited="true" kv="1"/>
+        <velocity joint="yumi_joint_7_r" ctrlrange="-100.0 100.0" ctrllimited="true" kv="1"/>
+        <velocity joint="yumi_joint_3_r" ctrlrange="-100.0 100.0" ctrllimited="true" kv="1"/>
+        <velocity joint="yumi_joint_4_r" ctrlrange="-100.0 100.0" ctrllimited="true" kv="1"/>
+        <velocity joint="yumi_joint_5_r" ctrlrange="-100.0 100.0" ctrllimited="true" kv="1"/>
+        <velocity joint="yumi_joint_6_r" ctrlrange="-100.0 100.0" ctrllimited="true" kv="1"/>
         <!--velocity joint="yumi_joint_1_l" ctrlrange="-200.0 200.0" ctrllimited="true" kv="100"/>
         <velocity joint="yumi_joint_2_l" ctrlrange="-20.0 20.0" ctrllimited="true" kv="100"/>
         <velocity joint="yumi_joint_7_l" ctrlrange="-20.0 20.0" ctrllimited="true" kv="60"/>

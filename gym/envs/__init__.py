@@ -7,6 +7,11 @@ register(
     reward_threshold=25.0,
 )
 
+register(
+    id='YumiPusher-v0',
+    entry_point='gym.envs.mujoco:YumiPusherEnv',
+)
+
 # Algorithmic
 # ----------------------------------------
 
