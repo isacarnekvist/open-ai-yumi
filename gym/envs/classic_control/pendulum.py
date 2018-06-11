@@ -58,7 +58,7 @@ class PendulumEnv(gym.Env):
         u = np.clip(u, -self.max_torque, self.max_torque)
 
         newthdot = thdot + (-3*g/(2*l) * np.sin(th + np.pi) + 3./(m*l**2)*u) * dt
-        newth = th + newthdot*dt
+        newth = angle_normalize(th + newthdot * dt)
         newthdot = np.clip(newthdot, -self.max_speed, self.max_speed)
 
         return np.concatenate([newth, newthdot])
