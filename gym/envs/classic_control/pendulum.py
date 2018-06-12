@@ -21,8 +21,8 @@ class PendulumEnv(gym.Env):
         self.action_cost = 0.001
 
         high = np.array([np.pi, self.max_speed])
-        self.action_space = spaces.Box(low=-self.max_torque, high=self.max_torque, shape=(1,))
-        self.observation_space = spaces.Box(low=-high, high=high)
+        self.action_space = spaces.Box(low=-self.max_torque, high=self.max_torque, shape=(1,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-high, high=high, dtype=np.float32)
         self.seed()
 
     def init_params(self, mass_coeff, action_coeff):
@@ -46,7 +46,7 @@ class PendulumEnv(gym.Env):
         th, thdot = state
         u = np.clip(u, -self.max_torque, self.max_torque)
         costs = angle_normalize(th)**2 + .1*thdot**2 + self.action_cost * (u**2)
-        return -costs[0]
+        return -np.float32(costs[0])
 
     def forward(self, state, u):
         g = self.g
@@ -71,7 +71,7 @@ class PendulumEnv(gym.Env):
 
     def _get_obs(self):
         theta, thetadot = self.state
-        return np.array([angle_normalize(theta), thetadot])
+        return np.array([angle_normalize(theta), thetadot], dtype=np.float32)
 
     def render(self, mode='human'):
 
