@@ -133,16 +133,16 @@
             </body>
         </body>
 
-        <body name="object" pos="0.04 -0.1 0.02">
-            <geom rgba="1 0 0 1" type="box" size="0.02 0.02 0.02" contype="1" density="10"/>
-            <joint name="goal_slidex" type="slide" pos="0 0 0" axis="1 0 0" damping="0.005"/>
-            <joint name="goal_slidey" type="slide" pos="0 0 0" axis="0 1 0" damping="0.005"/>
-            <joint name="goal_rotate" type="hinge" pos="0 0 0" axis="0 0 1" damping="0.00001"/>
+        <body name="object" pos="0.04 -0.1 0.018">
+            <geom rgba="0 0 1 1" type="box" size="0.0675 0.0275 0.018" contype="1" density="10"/>
+            <joint name="goal_slidex" type="slide" pos="0 0 0" axis="1 0 0" damping="0.1"/>
+            <joint name="goal_slidey" type="slide" pos="0 0 0" axis="0 1 0" damping="0.1"/>
+            <joint name="goal_rotate" type="hinge" pos="0 0 0" axis="0 0 1" damping="0.0001"/>
             <!--joint name="goal_slidez" type="slide" pos="0 0 0" axis="0 0 1" range="-10.3213 10.3" damping="1.0"/-->
         </body>
 
-        <body name="goal" pos="0.04 -0.1 0.021">
-            <geom rgba="1 0 0 0.2" type="box" size="0.02 0.02 0.019" contype="2" conaffinity="2"/>
+        <body name="goal" pos="0.04 0.00 0.020">
+            <geom rgba="0 0 1 0.2" type="box" size="0.0675 0.0275 0.016" contype="2" conaffinity="2"/>
         </body>
     </worldbody>
 
