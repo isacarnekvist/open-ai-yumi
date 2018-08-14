@@ -26,8 +26,8 @@ class PendulumEnv(gym.Env):
         self.seed()
 
     def init_params(self, mass_coeff, action_coeff):
-        self.m = 0.4 + mass_coeff * 0.4                  # [0.400, 0.800], original = 1.00
-        self.action_cost = 0.0005 + action_coeff * 0.0005    # [0.0005, 0.001], original = 0.001
+        self.m = 0.4 + mass_coeff * 0.8                      # [0.400, 1.2], original = 1.000
+        self.action_cost = 0.0 + action_coeff * 2.0          # [0.000, 2.0], original = 0.001
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -102,5 +102,17 @@ class PendulumEnv(gym.Env):
     def close(self):
         if self.viewer: self.viewer.close()
 
+
 def angle_normalize(x):
+    """
+    Example:
+    >>> angle_normalize(2 * np.pi + 1.0)
+    1.0
+    """
     return (((x+np.pi) % (2*np.pi)) - np.pi)
+
+
+if __name__ == '__main__':
+    env = PendulumEnv()
+    env.reset()
+    print(env.forward([np.pi - 1e-6, 0.1], [0.0]))

@@ -1,0 +1,37 @@
+<mujoco model="yumi">
+    <compiler angle="radian"/>
+    <visual>
+        <quality shadowsize="10000"/>
+    </visual>
+    <option timestep="0.01" gravity="0 0 0" integrator="Euler" />
+    <size njmax="500" nconmax="100" />
+    <worldbody>
+        <camera name="extra_1" mode="fixed" pos="1.0 0 0.2" euler="1.57 1.57 0"/>
+        <camera name="extra_2" mode="fixed" pos="0.7 0.7 0.2" euler="1.57 2.3 0"/>
+        <light diffuse=".5 .5 .5" pos="2 -2 2" dir="-1  1 -1"/>
+        <light diffuse=".5 .5 .5" pos="2  2 2" dir="-1 -1 -1"/>
+        <geom rgba="1 1 1 1" name="table" type="box" pos="0 0 -0.01" size="0.4 0.5 0.01" contype="2" conaffinity="2"/>
+        <body pos="0 0 0.035">
+            <geom type="cylinder" rgba="0.6 0.6 0.6 1" size="0.01 0.024" contype="1"/>
+            <joint name="eef_x" type="slide" pos="0 0 0" axis="1 0 0"/>
+            <joint name="eef_y" type="slide" pos="0 0 0" axis="0 1 0"/>
+        </body>
+
+        <body name="object" pos="0.0 0.0 0.018">
+            <geom rgba="0 0 1 1" type="box" size="0.0675 0.0275 0.018" contype="1" density="1"/>
+            <joint name="goal_slidex" type="slide" pos="0 0 0" axis="1 0 0" damping="0.1"/>
+            <joint name="goal_slidey" type="slide" pos="0 0 0" axis="0 1 0" damping="0.1"/>
+            <joint name="goal_rotate" type="hinge" pos="{{ rotation_x }} 0 0" axis="0 0 1" damping="0.0001"/>
+        </body>
+
+        <body name="goal" pos="0.0 0.0 0.020">
+            <geom rgba="0 0 1 0.2" type="box" size="0.0675 0.0275 0.016" contype="2" conaffinity="2"/>
+        </body>
+    </worldbody>
+
+    <actuator>
+        <velocity joint="eef_x" ctrlrange="-0.1 0.1" ctrllimited="true" kv="0.1"/>
+        <velocity joint="eef_y" ctrlrange="-0.1 0.1" ctrllimited="true" kv="0.1"/>
+    </actuator>
+
+</mujoco>

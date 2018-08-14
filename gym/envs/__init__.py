@@ -1,6 +1,12 @@
 from gym.envs.registration import registry, register, make, spec
 
 register(
+    id='SimplePusher-v0',
+    entry_point='gym.envs.mujoco:SimplePusherEnv',
+    max_episode_steps=100,
+)
+
+register(
     id='YumiReacher-v0',
     entry_point='gym.envs.mujoco:YumiReacherEnv',
     max_episode_steps=1000,

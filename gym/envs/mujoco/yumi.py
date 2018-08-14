@@ -86,7 +86,6 @@ class YumiPusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         y_ = eef_y - (obj_y - 0.1)
         eef_n_x = np.cos(-phi) * x_ - np.sin(-phi) * y_
         eef_n_y = np.sin(-phi) * x_ + np.cos(-phi) * y_
-        print(eef_n_x, eef_n_y)
 
         return obs * np.array([10.0, 10.0, 1, 1, 1, 1, 1, 1])
 
@@ -101,7 +100,7 @@ class YumiPusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         # cube init
         self.init_qpos[-3:-1] = np.random.randn(2) * 0.03
-        self.init_qpos[-1] = np.random.uniform(0, np.pi / 2)
+        self.init_qpos[-1] = np.random.uniform(-np.pi / 4, np.pi / 4)
         self.set_state(self.init_qpos, self.init_qvel)
         return self._get_obs()
 
@@ -270,13 +269,14 @@ if __name__ == '__main__':
     from datetime import datetime
     import gym
     env = gym.make('YumiPusher-v0')
-    env.seed(datetime.now().second)
     for _ in range(10):
+        env.seed(datetime.now().second)
         o = env.reset()
         xs = []
         ys = []
-        for θ in range(100):
+        for θ in np.linspace(0, 600, 200):
             θ = θ / 200
             a = [2 * np.cos(θ), 2 * np.sin(θ)]
-            o, r, _, _ = env.step(a)
-            env.render()
+            for _ in range(int(600 / 200)):
+                o, r, _, _ = env.step(a)
+                env.render()
